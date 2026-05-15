@@ -157,6 +157,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# CatBoost generate files
+catboost_info/
+
 # Spyder project settings
 .spyderproject
 .spyproject
