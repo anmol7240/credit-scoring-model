@@ -12,7 +12,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-from catboost import CatBoostClassifier
+
+# CatBoost is optional - may not install on some cloud platforms
+try:
+    from catboost import CatBoostClassifier
+    CATBOOST_AVAILABLE = True
+except ImportError:
+    CATBOOST_AVAILABLE = False
 
 from sklearn.metrics import roc_auc_score
 from imblearn.over_sampling import SMOTE
@@ -85,13 +91,15 @@ class ModelTrainer:
 
                 "XGBClassifier": XGBClassifier(),
 
-                "CatBoosting Classifier": CatBoostClassifier(
-                    verbose=False
-                ),
-
                 "AdaBoost Classifier": AdaBoostClassifier()
 
             }
+            
+            # Add CatBoost only if available
+            if CATBOOST_AVAILABLE:
+                models["CatBoosting Classifier"] = CatBoostClassifier(
+                    verbose=False
+                )
 
             params = {
 
