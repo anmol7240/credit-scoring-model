@@ -26,6 +26,11 @@ class PredictPipeline:
                 file_path=preprocessor_path
             )
 
+            # Add missing "Unnamed: 0" column if it doesn't exist
+            # (this column was present during training, so preprocessor expects it)
+            if "Unnamed: 0" not in features.columns:
+                features.insert(0, "Unnamed: 0", 0)
+
             # Transform input data
             data_scaled = preprocessor.transform(
                 features
