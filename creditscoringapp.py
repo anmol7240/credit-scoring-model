@@ -242,29 +242,6 @@ if st.button("Predict Credit Risk"):
         st.error(f"Error Occurred: {e}")
 
 
-    
-        # Feature Visualization
-        
-        st.subheader("Feature Overview")
-
-        fig, ax = plt.subplots(figsize=(10, 5))
-
-        sns.barplot(
-            x=input_df.columns,
-            y=input_df.iloc[0].values,
-            ax=ax
-        )
-
-        plt.xticks(rotation=90)
-
-        st.pyplot(fig)
-
-
-    except Exception as e:
-
-        st.error(f"Error Occurred: {e}")
-
-
 # Batch Prediction Section
 
 st.subheader("📂 Batch Prediction")

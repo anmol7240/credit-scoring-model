@@ -69,6 +69,31 @@ docker run -p 8501:8501 credit-scoring-app
 
 Then access at: **http://localhost:8501**
 
+### Streamlit Cloud Deployment
+
+**Deploy to Streamlit Cloud (Recommended for quick deployment):**
+
+1. **Push code to GitHub:**
+   ```bash
+   git add .
+   git commit -m "Ready for Streamlit Cloud"
+   git push origin main
+   ```
+
+2. **Connect to Streamlit Cloud:**
+   - Visit [https://streamlit.io/cloud](https://streamlit.io/cloud)
+   - Sign in with GitHub
+   - Click "New app" → Select your repository
+   - Set:
+     - **Main file path:** `creditscoringapp.py`
+     - **Python version:** 3.11
+
+3. **Deploy:**
+   - Click "Deploy" and wait for the app to build
+   - Share your public Streamlit Cloud URL
+
+**Note:** All model artifacts (model.pkl, preprocessor.pkl) must be in the `artifacts/` directory for the app to work properly on Streamlit Cloud.
+
 ---
 
 ## Use Case
