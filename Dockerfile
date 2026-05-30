@@ -1,5 +1,5 @@
 # Base Python Image
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # Set Working Directory
 WORKDIR /app
@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 8501
 
 # Run Streamlit App
-CMD ["streamlit", "run", "creditscoringapp.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.serverAddress=localhost"]
+CMD ["streamlit", "run", "creditscoringapp.py", "--server.port=8501", "--server.address=0.0.0.0"]

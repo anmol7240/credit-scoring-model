@@ -100,6 +100,7 @@ class ModelTrainer:
                 models["CatBoosting Classifier"] = CatBoostClassifier(
                     verbose=False
                 )
+            
 
             params = {
 
@@ -147,14 +148,6 @@ class ModelTrainer:
 
                 },
 
-                "CatBoosting Classifier": {
-
-                    "learning_rate": [0.01, 0.1],
-
-                    "depth": [4, 6, 8]
-
-                },
-
                 "AdaBoost Classifier": {
 
                     "learning_rate": [0.01, 0.1, 1],
@@ -164,6 +157,13 @@ class ModelTrainer:
                 }
 
             }
+            
+            # Add CatBoost parameters only if available
+            if CATBOOST_AVAILABLE:
+                params["CatBoosting Classifier"] = {
+                    "learning_rate": [0.01, 0.1],
+                    "depth": [4, 6, 8]
+                }
 
             model_report: dict = evaluate_models(
 

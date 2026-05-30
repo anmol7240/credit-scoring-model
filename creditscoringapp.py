@@ -1,9 +1,9 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 from src.pipeline.predict_pipeline import PredictPipeline
 from src.pipeline.predict_pipeline import CustomData
@@ -17,6 +17,20 @@ st.set_page_config(
     page_icon="💳",
     layout="wide"
 )
+
+
+@st.cache_resource
+def load_prediction_pipeline():
+    """Cache the prediction pipeline to avoid reloading on every interaction"""
+    return PredictPipeline()
+
+
+# Check if model artifacts exist
+def check_artifacts_exist():
+    """Check if required model artifacts are available"""
+    model_path = 'artifacts/model.pkl'
+    preprocessor_path = 'artifacts/preprocessor.pkl'
+    return os.path.exists(model_path) and os.path.exists(preprocessor_path)
 
 
 # Title
@@ -158,88 +172,93 @@ st.dataframe(input_df)
 
 if st.button("Predict Credit Risk"):
 
-    try:
+    if not check_artifacts_exist():
+        st.error("❌ Error: Model artifacts not found. Please train the model first.")
+        st.info("Required files: artifacts/model.pkl and artifacts/preprocessor.pkl")
+    else:
+        try:
 
-        # Create Custom Data Object
-        data = CustomData(
+            # Create Custom Data Object
+            data = CustomData(
 
-            RevolvingUtilizationOfUnsecuredLines=RevolvingUtilizationOfUnsecuredLines,
+                RevolvingUtilizationOfUnsecuredLines=RevolvingUtilizationOfUnsecuredLines,
 
-            age=age,
+                age=age,
 
-            NumberOfTime30_59DaysPastDueNotWorse=NumberOfTime30_59DaysPastDueNotWorse,
+                NumberOfTime30_59DaysPastDueNotWorse=NumberOfTime30_59DaysPastDueNotWorse,
 
-            DebtRatio=DebtRatio,
+                DebtRatio=DebtRatio,
 
-            MonthlyIncome=MonthlyIncome,
+                MonthlyIncome=MonthlyIncome,
 
-            NumberOfOpenCreditLinesAndLoans=NumberOfOpenCreditLinesAndLoans,
+                NumberOfOpenCreditLinesAndLoans=NumberOfOpenCreditLinesAndLoans,
 
-            NumberOfTimes90DaysLate=NumberOfTimes90DaysLate,
+                NumberOfTimes90DaysLate=NumberOfTimes90DaysLate,
 
-            NumberRealEstateLoansOrLines=NumberRealEstateLoansOrLines,
+                NumberRealEstateLoansOrLines=NumberRealEstateLoansOrLines,
 
-            NumberOfTime60_89DaysPastDueNotWorse=NumberOfTime60_89DaysPastDueNotWorse,
+                NumberOfTime60_89DaysPastDueNotWorse=NumberOfTime60_89DaysPastDueNotWorse,
 
-            NumberOfDependents=NumberOfDependents
+                NumberOfDependents=NumberOfDependents
 
-        )
-
-
-        # Convert into DataFrame
-        pred_df = data.get_data_as_data_frame()
-
-
-        # Prediction Pipeline
-        predict_pipeline = PredictPipeline()
-
-        prediction = predict_pipeline.predict(pred_df)
+            )
 
 
-        # Prediction Result
-        st.subheader("Prediction Result")
-
-        if prediction[0] == 1:
-
-            st.error("⚠️ High Risk Customer")
-
-            st.progress(90)
-
-        else:
-
-            st.success("✅ Low Risk Customer")
-
-            st.progress(20)
+            # Convert into DataFrame
+            pred_df = data.get_data_as_data_frame()
 
 
-        # Display Probability Style Output
-        if prediction[0] == 1:
-            st.write("Probability of Default: High")
-        else:
-            st.write("Probability of Default: Low")
+            # Prediction Pipeline (cached)
+            predict_pipeline = load_prediction_pipeline()
+
+            prediction = predict_pipeline.predict(pred_df)
 
 
-    
-        # Feature Visualization
+            # Prediction Result
+            st.subheader("Prediction Result")
+
+            if prediction[0] == 1:
+
+                st.error("⚠️ High Risk Customer")
+
+                st.progress(90)
+
+            else:
+
+                st.success("✅ Low Risk Customer")
+
+                st.progress(20)
+
+
+            # Display Probability Style Output
+            if prediction[0] == 1:
+                st.write("Probability of Default: High")
+            else:
+                st.write("Probability of Default: Low")
+
+
         
-        st.subheader("Feature Overview")
+            # Feature Visualization
+            
+            st.subheader("Feature Overview")
 
-        fig, ax = plt.subplots(figsize=(10, 5))
+            fig, ax = plt.subplots(figsize=(10, 5))
 
-        sns.barplot(
-            x=input_df.columns,
-            y=input_df.iloc[0].values,
-            ax=ax
-        )
+            sns.barplot(
+                x=input_df.columns,
+                y=input_df.iloc[0].values,
+                ax=ax
+            )
 
-        plt.xticks(rotation=90)
+            plt.xticks(rotation=90)
 
-        st.pyplot(fig)
+            st.pyplot(fig)
 
 
-    except Exception as e:
+        except Exception as e:
 
-        st.error(f"Error Occurred: {e}")
+            st.error(f"Error Occurred: {str(e)}")
+            st.info("Please check that all input values are valid and try again.")
 
 
 # Batch Prediction Section
@@ -254,48 +273,53 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
 
-    try:
+    if not check_artifacts_exist():
+        st.error("❌ Error: Model artifacts not found. Please train the model first.")
+        st.info("Required files: artifacts/model.pkl and artifacts/preprocessor.pkl")
+    else:
+        try:
 
-        batch_df = pd.read_csv(uploaded_file)
+            batch_df = pd.read_csv(uploaded_file)
 
-        st.write("Uploaded Dataset")
+            st.write("Uploaded Dataset")
 
-        st.dataframe(batch_df.head())
-
-
-        # Prediction Pipeline
-        predict_pipeline = PredictPipeline()
-
-        batch_predictions = predict_pipeline.predict(batch_df)
+            st.dataframe(batch_df.head())
 
 
-        # Add Prediction Column
-        batch_df["Prediction"] = batch_predictions
+            # Prediction Pipeline (cached)
+            predict_pipeline = load_prediction_pipeline()
+
+            batch_predictions = predict_pipeline.predict(batch_df)
 
 
-        # Convert 0/1 into Labels
-        batch_df["Prediction"] = batch_df["Prediction"].map({
-            0: "Low Risk",
-            1: "High Risk"
-        })
+            # Add Prediction Column
+            batch_df["Prediction"] = batch_predictions
 
 
-        st.subheader("Batch Prediction Result")
-
-        st.dataframe(batch_df)
-
-
-        # Download Button
-        csv = batch_df.to_csv(index=False).encode('utf-8')
-
-        st.download_button(
-            label="Download Predictions CSV",
-            data=csv,
-            file_name="credit_predictions.csv",
-            mime="text/csv"
-        )
+            # Convert 0/1 into Labels
+            batch_df["Prediction"] = batch_df["Prediction"].map({
+                0: "Low Risk",
+                1: "High Risk"
+            })
 
 
-    except Exception as e:
+            st.subheader("Batch Prediction Result")
 
-        st.error(f"Batch Prediction Error: {e}")
+            st.dataframe(batch_df)
+
+
+            # Download Button
+            csv = batch_df.to_csv(index=False).encode('utf-8')
+
+            st.download_button(
+                label="Download Predictions CSV",
+                data=csv,
+                file_name="credit_predictions.csv",
+                mime="text/csv"
+            )
+
+
+        except Exception as e:
+
+            st.error(f"Batch Prediction Error: {str(e)}")
+            st.info("Please ensure the CSV file has the correct format with all required columns.")

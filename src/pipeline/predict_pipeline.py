@@ -1,4 +1,5 @@
 import sys
+import os
 import pandas as pd
 
 from src.exception import CustomException
@@ -17,6 +18,13 @@ class PredictPipeline:
             model_path = 'artifacts/model.pkl'
 
             preprocessor_path = 'artifacts/preprocessor.pkl'
+
+            # Check if files exist
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(f"Model file not found at {model_path}")
+            
+            if not os.path.exists(preprocessor_path):
+                raise FileNotFoundError(f"Preprocessor file not found at {preprocessor_path}")
 
             model = load_object(
                 file_path=model_path
