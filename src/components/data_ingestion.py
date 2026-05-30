@@ -25,6 +25,10 @@ class DataIngestion:
             df=pd.read_csv("notebook/data/credit_data.csv")
             logging.info("Read the dataset as dataframe")
 
+
+            if "Unnamed: 0" in df.columns:
+                df = df.drop(columns=["Unnamed: 0"])
+
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path),exist_ok=True)
 
             df.to_csv(self.ingestion_config.raw_data_path,index=False,header=True)

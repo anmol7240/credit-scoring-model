@@ -15,16 +15,18 @@ class PredictPipeline:
 
         try:
 
-            model_path = 'artifacts/model.pkl'
+            model_path = "artifacts/model.pkl"
+            preprocessor_path = "artifacts/preprocessor.pkl"
 
-            preprocessor_path = 'artifacts/preprocessor.pkl'
-
-            # Check if files exist
             if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Model file not found at {model_path}")
-            
+                raise FileNotFoundError(
+                    f"Model file not found at {model_path}"
+                )
+
             if not os.path.exists(preprocessor_path):
-                raise FileNotFoundError(f"Preprocessor file not found at {preprocessor_path}")
+                raise FileNotFoundError(
+                    f"Preprocessor file not found at {preprocessor_path}"
+                )
 
             model = load_object(
                 file_path=model_path
@@ -34,17 +36,10 @@ class PredictPipeline:
                 file_path=preprocessor_path
             )
 
-            # Add missing "Unnamed: 0" column if it doesn't exist
-            # (this column was present during training, so preprocessor expects it)
-            if "Unnamed: 0" not in features.columns:
-                features.insert(0, "Unnamed: 0", 0)
-
-            # Transform input data
             data_scaled = preprocessor.transform(
                 features
             )
 
-            # Prediction
             preds = model.predict(
                 data_scaled
             )
@@ -52,16 +47,13 @@ class PredictPipeline:
             return preds
 
         except Exception as e:
-
             raise CustomException(e, sys)
 
 
 class CustomData:
 
     def __init__(
-
         self,
-
         RevolvingUtilizationOfUnsecuredLines: float,
         age: int,
         NumberOfTime30_59DaysPastDueNotWorse: int,
@@ -72,27 +64,17 @@ class CustomData:
         NumberRealEstateLoansOrLines: int,
         NumberOfTime60_89DaysPastDueNotWorse: int,
         NumberOfDependents: int
-
     ):
 
         self.RevolvingUtilizationOfUnsecuredLines = RevolvingUtilizationOfUnsecuredLines
-
         self.age = age
-
         self.NumberOfTime30_59DaysPastDueNotWorse = NumberOfTime30_59DaysPastDueNotWorse
-
         self.DebtRatio = DebtRatio
-
         self.MonthlyIncome = MonthlyIncome
-
         self.NumberOfOpenCreditLinesAndLoans = NumberOfOpenCreditLinesAndLoans
-
         self.NumberOfTimes90DaysLate = NumberOfTimes90DaysLate
-
         self.NumberRealEstateLoansOrLines = NumberRealEstateLoansOrLines
-
         self.NumberOfTime60_89DaysPastDueNotWorse = NumberOfTime60_89DaysPastDueNotWorse
-
         self.NumberOfDependents = NumberOfDependents
 
     def get_data_as_data_frame(self):
@@ -140,7 +122,6 @@ class CustomData:
                 "NumberOfDependents": [
                     self.NumberOfDependents
                 ]
-
             }
 
             return pd.DataFrame(
@@ -148,5 +129,4 @@ class CustomData:
             )
 
         except Exception as e:
-
             raise CustomException(e, sys)

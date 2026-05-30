@@ -2,30 +2,14 @@ import os
 import sys
 from dataclasses import dataclass
 
-from sklearn.ensemble import (
-    AdaBoostClassifier,
-    RandomForestClassifier,
-    GradientBoostingClassifier
-)
-
 from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-
-# CatBoost is optional - may not install on some cloud platforms
-try:
-    from catboost import CatBoostClassifier
-    CATBOOST_AVAILABLE = True
-except ImportError:
-    CATBOOST_AVAILABLE = False
 
 from sklearn.metrics import roc_auc_score
 from imblearn.over_sampling import SMOTE
 
 from src.exception import CustomException
 from src.logger import logging
-
 from src.utils import save_object, evaluate_models
 
 
@@ -81,26 +65,12 @@ class ModelTrainer:
 
                 "Logistic Regression": LogisticRegression(),
 
-                "K-Neighbors Classifier": KNeighborsClassifier(),
-
-                "Decision Tree": DecisionTreeClassifier(),
-
-                "Random Forest Classifier": RandomForestClassifier(),
-
-                "Gradient Boosting Classifier": GradientBoostingClassifier(),
-
-                "XGBClassifier": XGBClassifier(),
-
-                "AdaBoost Classifier": AdaBoostClassifier()
+                "XGBClassifier": XGBClassifier(
+                    random_state=42,
+                    eval_metric="logloss"
+                )
 
             }
-            
-            # Add CatBoost only if available
-            if CATBOOST_AVAILABLE:
-                models["CatBoosting Classifier"] = CatBoostClassifier(
-                    verbose=False
-                )
-            
 
             params = {
 
@@ -110,60 +80,17 @@ class ModelTrainer:
 
                 },
 
-                "K-Neighbors Classifier": {
-
-                    "n_neighbors": [3, 5, 7, 9]
-
-                },
-
-                "Decision Tree": {
-
-                    "criterion": ["gini", "entropy"],
-
-                    "max_depth": [5, 10, 15, None]
-
-                },
-
-                "Random Forest Classifier": {
-
-                    "n_estimators": [50, 100, 200],
-
-                    "max_depth": [5, 10, None]
-
-                },
-
-                "Gradient Boosting Classifier": {
-
-                    "learning_rate": [0.01, 0.1, 0.5],
-
-                    "n_estimators": [50, 100, 200]
-
-                },
-
                 "XGBClassifier": {
 
-                    "learning_rate": [0.01, 0.1, 0.5],
+                    "learning_rate": [0.01, 0.1],
 
-                    "n_estimators": [50, 100, 200]
+                    "n_estimators": [50, 100],
 
-                },
-
-                "AdaBoost Classifier": {
-
-                    "learning_rate": [0.01, 0.1, 1],
-
-                    "n_estimators": [50, 100, 200]
+                    "max_depth": [3, 5]
 
                 }
 
             }
-            
-            # Add CatBoost parameters only if available
-            if CATBOOST_AVAILABLE:
-                params["CatBoosting Classifier"] = {
-                    "learning_rate": [0.01, 0.1],
-                    "depth": [4, 6, 8]
-                }
 
             model_report: dict = evaluate_models(
 
@@ -206,13 +133,13 @@ class ModelTrainer:
                 f"Best model found: {best_model_name}"
             )
 
-            # Train best model
+            # Train Best Model
             best_model.fit(
                 X_train_smote,
                 y_train_smote
             )
 
-            # Save model
+            # Save Model
             save_object(
 
                 file_path=self.model_trainer_config.trained_model_file_path,
