@@ -25,6 +25,14 @@ The project demonstrates:
 
 ---
 
+## 🚀 Live Demo
+
+Check out the live dashboard here:
+
+[🔗 Open in Streamlit](https://credit-scoring-model-hkbhpf34xqinyaohzw7sxp.streamlit.app/)
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -261,7 +269,7 @@ Real-time Predictions + Risk Classification
 
 ### Single Customer Prediction
 
-1. Open the Streamlit app at `http://localhost:8501`
+1. Open the Streamlit app at [🔗 Open in Streamlit](https://credit-scoring-model-hkbhpf34xqinyaohzw7sxp.streamlit.app/)
 2. Enter customer credit details in the sidebar:
    - Revolving Utilization Of Unsecured Lines
    - Age
