@@ -3,7 +3,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import shap
 import os
+
+from src.utils import load_object
 
 from src.pipeline.predict_pipeline import PredictPipeline
 from src.pipeline.predict_pipeline import CustomData
@@ -213,6 +216,11 @@ if st.button("Predict Credit Risk"):
 
             prediction = predict_pipeline.predict(pred_df)
 
+            #Probability Prediction
+            probability = predict_pipeline.predict_proba(pred_df)
+
+            risk_probability = probability[0][1] * 100
+
 
             # Prediction Result
             st.subheader("Prediction Result")
@@ -228,29 +236,45 @@ if st.button("Predict Credit Risk"):
                 st.success("✅ Low Risk Customer")
 
                 st.progress(20)
+            
+            # probability Result
+            st.metric(
+                label="Default Probability",
+                value=f"{risk_probability:.2f}%"
+            )
 
+            if risk_probability < 30:
 
-            # Display Probability Style Output
-            if prediction[0] == 1:
-                st.write("Probability of Default: High")
+                st.success("🟢 Low Default Risk")
+
+            elif risk_probability < 70:
+
+                st.warning("🟡 Medium Default Risk")
+
             else:
-                st.write("Probability of Default: Low")
+
+                st.error("🔴 High Default Risk")
 
 
         
-            # Feature Visualization
-            
-            st.subheader("Feature Overview")
+            # SHAP Explainability
+            st.subheader("SHAP Explainability")
+
+            model = load_object("artifacts/model.pkl")
+            preprocessor = load_object("artifacts/preprocessor.pkl")
+
+            input_scaled = preprocessor.transform(input_df)
+
+            explainer = shap.Explainer(model, input_scaled)
+
+            shap_values = explainer(input_scaled)
 
             fig, ax = plt.subplots(figsize=(10, 5))
 
-            sns.barplot(
-                x=input_df.columns,
-                y=input_df.iloc[0].values,
-                ax=ax
+            shap.plots.bar(
+                shap_values[0],
+                show=False
             )
-
-            plt.xticks(rotation=90)
 
             st.pyplot(fig)
 

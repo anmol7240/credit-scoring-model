@@ -7,3 +7,4 @@ scikit-learn==1.5.0
 dill==0.3.8
 xgboost==2.0.3
 imbalanced-learn==0.12.3
+shap==0.46.0
