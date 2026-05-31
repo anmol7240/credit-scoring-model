@@ -1,16 +1,16 @@
-"# 💳 Credit Scoring & Loan Decision System
+# 💳 Credit Scoring & Loan Decision System
 
 ## Project Overview
 
 This is an interactive **Streamlit web application** for **credit risk assessment and prediction**.
-It predicts the likelihood of a customer defaulting on a loan using **Machine Learning models** (CatBoost, XGBoost, Logistic Regression) and provides actionable insights for loan approval decisions.
+It predicts the likelihood of a customer defaulting on a loan using **Machine Learning models** (XGBoost, Logistic Regression) and provides actionable insights for loan approval decisions.
 
 The app provides:
 
 * **Real-time credit risk predictions** using pre-trained ML models
 * **Interactive Streamlit dashboard** for easy credit scoring
 * **Batch CSV upload** for scoring multiple customers at once
-* **Pre-trained ML models** (CatBoost, XGBoost) and feature scaler for fast inference
+* **Pre-trained ML models** (XGBoost, Logistic Regression) and feature scaler for fast inference
 * **Comprehensive logging and exception handling** for robust production deployment
 * **Containerized deployment** using Docker
 
@@ -18,7 +18,7 @@ The project demonstrates:
 
 * Python for **data preprocessing, feature engineering, and modeling**
 * Pandas & NumPy for **data wrangling and transformation**
-* CatBoost, XGBoost & Scikit-learn for **classification and probability predictions**
+* XGBoost & Scikit-learn for **classification and probability predictions**
 * Streamlit & Matplotlib for **interactive dashboards and visualizations**
 * Custom pipeline architecture for **modular and scalable design**
 * Docker for **containerized deployment**
@@ -92,7 +92,7 @@ Then access at: **http://localhost:8501**
    - Click "Deploy" and wait for the app to build
    - Share your public Streamlit Cloud URL
 
-**Note:** All model artifacts (model.pkl, preprocessor.pkl) must be in the `artifacts/` directory for the app to work properly on Streamlit Cloud.
+**Note:** All model artifacts (`model.pkl`, `preprocessor.pkl`) must be in the `artifacts/` directory for the app to work properly on Streamlit Cloud.
 
 ---
 
@@ -123,14 +123,14 @@ This app is ideal for:
 
 ### ✅ Batch Predictions
 
-* Upload custom CSVs to score multiple customers at once
-* Download predictions for further analysis
+* Upload a CSV file with multiple customers
+* Get predictions for all records at once
+* Download results as CSV
 
 ### ✅ Pre-trained & Optimized Models
 
-* **CatBoost** - Gradient boosting model optimized for credit scoring
-* **XGBoost** - Alternative boosting model for comparison
-* Models trained on historical credit data with cross-validation
+* **XGBoost** – Gradient boosting model optimized for credit scoring with high accuracy
+* **Logistic Regression** – Interpretable linear model for baseline credit risk classification
 
 ### ✅ Feature Engineering & Scaling
 
@@ -153,89 +153,92 @@ credit-scoring-model/
 ├── creditscoringapp.py              # Streamlit web application
 ├── requirements.txt                 # Python dependencies
 ├── Dockerfile                       # Docker configuration
-├── setup.py                        # Package setup
-├── README.md                       # Project documentation
+├── setup.py                         # Package setup
+├── runtime.txt                      # Python runtime version
+├── README.md                        # Project documentation
 │
-├── artifacts/                      # Pre-trained models and data
-│   ├── model.pkl                  # Trained ML model
-│   ├── preprocessor.pkl           # Feature scaler
-│   ├── train.csv                  # Training dataset
-│   ├── test.csv                   # Testing dataset
-│   └── data.csv                   # Full dataset
+├── artifacts/                       # Pre-trained models and data
+│   ├── model.pkl                   # Trained ML model (XGBoost / Logistic Regression)
+│   ├── preprocessor.pkl            # Feature scaler (StandardScaler)
+│   ├── train.csv                   # Training dataset
+│   ├── test.csv                    # Testing dataset
+│   └── data.csv                    # Full dataset
 │
-├── src/                           # Source code
+├── src/                            # Source code
 │   ├── __init__.py
-│   ├── exception.py              # Custom exception handling
-│   ├── logger.py                 # Logging configuration
-│   ├── utils.py                  # Utility functions
-│   ├── components/               # Data pipeline components
+│   ├── exception.py               # Custom exception handling
+│   ├── logger.py                  # Logging configuration
+│   ├── utils.py                   # Utility functions
+│   ├── components/                # Data pipeline components
 │   │   ├── __init__.py
-│   │   ├── data_ingestion.py    # Load and ingest data
+│   │   ├── data_ingestion.py     # Load and ingest data
 │   │   ├── data_transformation.py # Feature engineering
-│   │   └── model_trainer.py      # Model training
-│   └── pipeline/                # Prediction pipelines
+│   │   └── model_trainer.py       # Model training
+│   └── pipeline/                  # Prediction pipelines
 │       ├── __init__.py
-│       ├── train_pipeline.py    # Training workflow
-│       └── predict_pipeline.py  # Prediction workflow
+│       ├── train_pipeline.py     # Training workflow
+│       └── predict_pipeline.py   # Prediction workflow
 │
-├── notebook/                     # Jupyter notebooks
-│   ├── EDA CREDIT SCORING.IPYNB       # Exploratory data analysis
-│   ├── MODEL TRAINING.ipynb           # Model development
-│   └── data/                          # Notebook datasets
+├── notebook/                      # Jupyter notebooks
+│   ├── EDA CREDIT SCORING.IPYNB        # Exploratory data analysis
+│   ├── MODEL TRAINING.ipynb            # Model development
+│   └── data/                           # Notebook datasets
+│       └── credit_data.csv
 │
-├── logs/                        # Application logs
-├── catboost_info/               # CatBoost training info
-└── credit_scoring_model.egg-info/  # Package metadata
+├── logs/                          # Application logs
+└── credit_scoring_model.egg-info/ # Package metadata
 ```
 
 ---
 
 ## Dataset
 
-The dataset consists of historical credit information with the following features:
+The dataset is based on the **GiveMeSomeCredit** benchmark dataset with the following features:
 
-* `RevolvingUtilizationOfUnsecuredLines` - Credit utilization ratio
-* `Age` - Customer age
-* `NumberOfTime30_59DaysPastDueNotWorse` - Late payments (30-59 days)
-* `DebtRatio` - Debt-to-income ratio
-* `MonthlyIncome` - Customer monthly income
-* `NumberOfOpenCreditLinesAndLoans` - Open credit accounts
-* `NumberOfTimes90DaysLate` - Late payments (90+ days)
-* `NumberRealEstateLoansOrLines` - Real estate credit lines
-* `NumberOfTime60_89DaysPastDueNotWorse` - Late payments (60-89 days)
-* `NumberOfDependents` - Number of dependents
+| Feature | Description |
+|---|---|
+| `RevolvingUtilizationOfUnsecuredLines` | Credit card and personal line utilization ratio |
+| `age` | Customer age |
+| `NumberOfTime30-59DaysPastDueNotWorse` | Number of times 30–59 days past due |
+| `DebtRatio` | Monthly debt payments divided by monthly income |
+| `MonthlyIncome` | Customer monthly income |
+| `NumberOfOpenCreditLinesAndLoans` | Number of open loans and lines of credit |
+| `NumberOfTimes90DaysLate` | Number of times 90+ days past due |
+| `NumberRealEstateLoansOrLines` | Number of mortgage and real estate loans |
+| `NumberOfTime60-89DaysPastDueNotWorse` | Number of times 60–89 days past due |
+| `NumberOfDependents` | Number of dependents in the family |
 
-**Target Variable:** Credit default (High Risk / Low Risk)
+**Target Variable:** `SeriousDlqin2yrs` — Binary classification (1 = High Risk / 0 = Low Risk)
 
 ---
 
 ## Tech Stack
 
-| Category          | Tools                                       |
-| ----------------- | ------------------------------------------- |
-| Programming       | Python 3.10                                 |
-| Data Handling     | Pandas, NumPy                               |
-| Machine Learning  | CatBoost, XGBoost, Scikit-learn             |
-| Preprocessing     | StandardScaler, Feature Engineering         |
-| Web App           | Streamlit                                   |
-| Visualization     | Matplotlib, Seaborn                         |
-| Model Persistence | dill, joblib                                |
-| Notebook Analysis | Jupyter Notebook                            |
-| Deployment        | Docker, Streamlit Cloud                     |
-| Logging & Error   | Custom Logger, Exception Handling           |
+| Category | Tools |
+|---|---|
+| Programming | Python 3.10+ |
+| Data Handling | Pandas, NumPy |
+| Machine Learning | XGBoost, Scikit-learn (Logistic Regression) |
+| Preprocessing | StandardScaler, Feature Engineering |
+| Web App | Streamlit |
+| Visualization | Matplotlib, Seaborn |
+| Model Persistence | dill, joblib |
+| Notebook Analysis | Jupyter Notebook |
+| Deployment | Docker, Streamlit Cloud |
+| Logging & Error | Custom Logger, Exception Handling |
 
 ---
 
 ## Workflow Architecture
 
 ```
-Raw Credit Data 
+Raw Credit Data
     ↓
 Data Ingestion (components/data_ingestion.py)
     ↓
 Data Transformation & Feature Engineering (components/data_transformation.py)
     ↓
-Model Training (components/model_trainer.py)
+Model Training — XGBoost & Logistic Regression (components/model_trainer.py)
     ↓
 Pre-trained Model Artifacts (artifacts/)
     ↓
@@ -247,10 +250,10 @@ Real-time Predictions + Risk Classification
 ### Key Pipeline Steps:
 
 1. **Data Ingestion** – Load credit data from CSV files
-2. **Data Transformation** – Feature scaling and engineering using StandardScaler
-3. **Model Training** – Train CatBoost/XGBoost models with cross-validation
-4. **Prediction** – Score new customers using the trained models
-5. **Result** – Display prediction and risk classification in Streamlit dashboard
+2. **Data Transformation** – Feature scaling using StandardScaler
+3. **Model Training** – Train XGBoost and Logistic Regression models with cross-validation; best model saved
+4. **Prediction** – Score new customers using the best trained model
+5. **Result** – Display prediction and risk classification in the Streamlit dashboard
 
 ---
 
@@ -258,7 +261,7 @@ Real-time Predictions + Risk Classification
 
 ### Single Customer Prediction
 
-1. Open the Streamlit app
+1. Open the Streamlit app at `http://localhost:8501`
 2. Enter customer credit details in the sidebar:
    - Revolving Utilization Of Unsecured Lines
    - Age
@@ -266,55 +269,61 @@ Real-time Predictions + Risk Classification
    - Monthly Income
    - Number of Dependents
    - And other credit metrics
-3. Click **"Predict Credit Risk"** button
-4. View the prediction result and risk classification
+3. Click **"Predict Credit Risk"**
+4. View the prediction result, default probability, and risk classification
 
-### Batch Predictions (Future Enhancement)
+### Batch Prediction
 
-- Upload a CSV file with multiple customers
-- Get predictions for all records at once
-- Download results
+1. Prepare a CSV file with the required columns (see Dataset section above)
+2. Upload the CSV using the **"Batch Prediction"** file uploader
+3. View predictions for all customers in the table
+4. Click **"Download Predictions CSV"** to save results
+
+**Required CSV columns:**
+```
+RevolvingUtilizationOfUnsecuredLines, age, NumberOfTime30-59DaysPastDueNotWorse,
+DebtRatio, MonthlyIncome, NumberOfOpenCreditLinesAndLoans, NumberOfTimes90DaysLate,
+NumberRealEstateLoansOrLines, NumberOfTime60-89DaysPastDueNotWorse, NumberOfDependents
+```
 
 ---
 
 ## Model Performance
 
-- **Models Used:** CatBoost, XGBoost
+| Model | Description |
+|---|---|
+| **XGBoost** | Gradient boosted trees; handles imbalanced data well, high predictive accuracy |
+| **Logistic Regression** | Fast, interpretable linear baseline; effective for linearly separable patterns |
+
 - **Validation:** K-Fold Cross-Validation
-- **Feature Scaling:** StandardScaler (StandardScaler for feature normalization)
-- **Target:** Binary classification (Default/No Default)
-
----
-
-## Environment Variables
-
-No additional environment variables required. The app uses default configurations.
+- **Feature Scaling:** StandardScaler
+- **Target:** Binary classification — Default (1) / No Default (0)
+- **Best model** is automatically selected and saved to `artifacts/model.pkl`
 
 ---
 
 ## Logging
 
-Logs are stored in the `logs/` directory for monitoring application behavior and debugging issues.
+Logs are stored in the `logs/` directory for monitoring application behavior and debugging.
 
-Check `src/logger.py` for logging configuration.
+See `src/logger.py` for logging configuration.
 
 ---
 
 ## Exception Handling
 
-Custom exception handling is implemented in `src/exception.py` to provide detailed error messages and stack traces for debugging.
+Custom exception handling is implemented in `src/exception.py` to provide detailed error messages with script name and line number for easier debugging.
 
 ---
 
 ## Future Enhancements
 
 - [ ] SHAP feature interpretability visualization
-- [ ] Batch CSV upload functionality
 - [ ] Model performance metrics dashboard
-- [ ] API endpoint deployment
+- [ ] API endpoint deployment (FastAPI)
 - [ ] Real-time model retraining pipeline
+- [ ] Integration with cloud storage (AWS S3 / Cloudflare R2)
 - [ ] Multi-model ensemble predictions
-- [ ] Integration with Cloudflare R2 for cloud storage
 
 ---
 
@@ -322,9 +331,9 @@ Custom exception handling is implemented in `src/exception.py` to provide detail
 
 Contributions are welcome! Please follow these steps:
 
-1. Create a new branch for your feature
-2. Make your changes
-3. Test thoroughly
+1. Fork the repository
+2. Create a new branch for your feature (`git checkout -b feature/your-feature`)
+3. Make your changes and test thoroughly
 4. Submit a pull request
 
 ---
@@ -337,11 +346,11 @@ For questions or issues, please open a GitHub issue or contact the project maint
 
 ## Acknowledgments
 
-- Data preprocessing inspired by credit risk modeling best practices
-- CatBoost and XGBoost for powerful gradient boosting implementations
+- Dataset sourced from the **GiveMeSomeCredit** Kaggle competition
+- XGBoost and Scikit-learn for powerful ML implementations
 - Streamlit for making it easy to build interactive data apps
 
 ---
 
-**Last Updated:** May 2026  
-**Version:** 1.0" 
+**Last Updated:** May 2026
+**Version:** 1.0
