@@ -75,7 +75,6 @@ docker build -t credit-scoring-app .
 docker run -p 8501:8501 credit-scoring-app
 ```
 
-Then access at: **http://localhost:8501**
 
 ### Streamlit Cloud Deployment
 
